@@ -41,14 +41,14 @@ public interface TokenNames {
   public static final int NO_MATCH = 1000;
 
   public static Map<Integer, String> getTokenNameMap() {
-    Map<Integer, String> tokenMap = new HashMap<>();  
-    tokenMap.put(0, "EOF");
-    tokenMap.put(1, "PLUS");
-    tokenMap.put(2, "MINUS");
-    tokenMap.put(3, "TIMES");
-    tokenMap.put(4, "DIVIDE");
-    tokenMap.put(5, "LPAREN");
-    tokenMap.put(6, "RPAREN");
+        Map<Integer, String> tokenMap = new HashMap<>();  
+        tokenMap.put(0, "EOF");
+        tokenMap.put(1, "PLUS");
+        tokenMap.put(2, "MINUS");
+        tokenMap.put(3, "TIMES");
+        tokenMap.put(4, "DIVIDE");
+        tokenMap.put(5, "LPAREN");
+        tokenMap.put(6, "RPAREN");
         tokenMap.put(7, "LBRACK");
         tokenMap.put(8, "RBRACK");
         tokenMap.put(9, "LBRACE");
@@ -75,7 +75,7 @@ public interface TokenNames {
         tokenMap.put(30, "STRING");
         tokenMap.put(31, "INT");
         tokenMap.put(32, "ID");
-        
+
         return tokenMap;
     }
 }

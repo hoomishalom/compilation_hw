@@ -88,11 +88,11 @@ CommentValue1  = ({Letters}|{Digits}|{WhiteSpaceChars}|[\(\)\[\]\{\}\?\!\+\-\*\/
 NotStar     = {Letters}|{Digits}|{WhiteSpace}|[\(\)\[\]\{\}\?\!\+\-\/\.\;]
 StarSeq     = \*+
 NotSlash    = {Letters}|{Digits}|{WhiteSpace}|[\(\)\[\]\{\}\?\!\+\-\.\;]
-CommentValue2 = ({NotStar}|{StarSeq}{NotSlash})*
+CommentValue2 = ({NotStar}|{StarSeq}{NotSlash})* 
 
 CommentType1		= \/\/{CommentValue1}{LineTerminator}
 CommentType2       = \/\*{CommentValue2}\*+\/
-WrongCommentType2 = \/\*
+WrongCommentType2 = \/\* 
 
 
 /******************************/
