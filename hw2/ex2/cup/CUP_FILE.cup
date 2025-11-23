@@ -62,12 +62,18 @@ terminal LBRACE;
 terminal RBRACE;
 terminal SEMICOLON;
 terminal ASSIGN;
+terminal TYPE_INT;
+terminal TYPE_STRING;
+terminal TYPE_VOID;
+
 
 /*************/
 /* TERMINALS */
 /*************/
+terminal String STRING;
 terminal Integer INT;
 terminal String ID;
+terminal Void nil;
 
 /*****************/
 /* NON TERMINALS */
@@ -93,10 +99,106 @@ start with stmtList;
 /********************/
 /* DERIVATION RULES */
 /********************/
+					
+program 	::= 	dec:d
+					{: 
+						AstProgram p = new AstProgram();
+						p.add(d); 
+						RESULT = p; 
+					:}
+    
+    		| 
+        			program:p dec:d 
+					{: 
+						p.add(d); 
+						RESULT = p; 
+					:}
+			;
 
+
+dec 		::=		varDec:v        {: RESULT = v; :}
+					| funcDec:f       {: RESULT = f; :}
+					| classDec:c      {: RESULT = c; :}
+					| arrayTypedef:a  {: RESULT = a; :}
+					;
+
+type		::=		TYPE_INT		{: RESULT = new AstTypeInt(); 		:}
+					| TYPE_VOID		{: RESULT = new AstTypeVoid(); 		:}
+					| TYPE_STRING	{: RESULT = new AstTypeString(); 	:}
+					| ID:name		{: RESULT = new AstTypeClass(name); :}
+					;
+
+
+assExpOpt 	::=		ASSIGN exp:e {: RESULT = e; :}
+					| {: RESULT = null; :}
+					;
+varDec		::= 	type:t ID:name assExpOpt:e SEMICOLON {: RESULT = new AstVarDec(t, name, e); :}
+					| type:t ID:name ASSIGN newExp:e SEMICOLON
+					{: RESULT = new AstVarDec(t, name, e); :}
+					;
+
+
+funcArg		::=		type ID:name 
+					;
+funcArgList	::=		funcArg COMMA funcArgList // TODO: make list
+					| funcArg					
+					;
+funcDec 	::= 	type:t ID:name LPAREN funcArgList:args RPAREN LBRACE stmtList:body RBRACE
+					;
+
+// TODO: make list
 stmtList	::=		stmt:s	stmtList:l		{: RESULT = new AstStmtList(s,l);    :}
 					| stmt:s				{: RESULT = new AstStmtList(s,null); :}
 					;
+
+cField		::=		varDec 
+					| funcDec
+					;
+// TODO: make list
+cFieldList	::=		cField cFieldList
+					| cField
+					;
+optionalId	::= 	EXTENDS ID
+					| 
+					;
+classDec	::= 	CLASS ID optionalId LBRACE cFieldList RBRACE
+					;
+
+arrayTypedef ::=	ARRAY ID EQ type LBRACK RBRACK SEMICOLON
+		
+operator 	::= 	PLUS	
+					| MINUS
+					| TIMES
+					| DIVIDE
+					| LT
+					| GT
+					| EQ
+					;
+minusOpt	::= 	MINUS
+					| 
+					;
+minusType	::=		INT 
+					| NIL
+					| STRING
+					;
+exp			::=		var LPAREN exp:e RPAREN {: RESULT = e;:}
+					| exp operator exp
+					| callExp
+					| var:v								{: RESULT = new AstExpVar(v);          :}
+					| minOpt minusType
+					;
+newExp 		::= 	NEW type:name {:RESULT = new AstClassDecl():} 
+					| NEW type:name LBRACK exp:args RBRACK {:RESULT = new AstClassDecl():} 
+					;
+
+
+varDotOpt	::=		var DOT
+					| 
+					;
+comExpListOpt	::=		COMMA exp // TODO: make list
+						|
+						;
+callExp		::= 	varDotOpt ID LPAREN 
 
 var			::=		ID:name								{: RESULT = new AstVarSimple(name);       :}
 					| var:v DOT ID:fieldName			{: RESULT = new AstVarField(v,fieldName); :}
@@ -107,9 +209,6 @@ stmt		::=		var:v ASSIGN exp:e SEMICOLON								{: RESULT = new AstStmtAssign(v,e
 					| IF    LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtIf(   cond,body); :}
 					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtWhile(cond,body); :}
 					;
+ 
 
-exp			::=		INT:i								{: RESULT = new AstExpInt(i);          :}
-					| var:v								{: RESULT = new AstExpVar(v);          :}
-					| exp:e1 PLUS  exp:e2				{: RESULT = new AstExpBinop(e1, e2, 0);:}
-					| exp:e1 MINUS exp:e2				{: RESULT = new AstExpBinop(e1, e2, 1);:}
-					;
+
