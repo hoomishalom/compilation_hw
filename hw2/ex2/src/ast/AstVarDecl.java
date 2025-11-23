@@ -26,3 +26,4 @@ public class AstVarDecl extends AstStmt
 		if (initialValue != null) initialValue.printMe();
 	}
 }
+// **
