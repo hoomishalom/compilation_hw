@@ -105,12 +105,21 @@ non terminal List<AstFormal> funcArgList;
 non terminal AstFormal funcArg;
 non terminal List<AstDecl> cFieldList;
 non terminal AstDecl cField;
-non terminal List<AstExp> comExpListOpt;
 non terminal List<AstExp> comExpList;
 non terminal AstExp newExp;
 non terminal AstCall callExp;
 non terminal String optionalId;
 non terminal AstExp assExpOpt;
+
+non terminal ArrayList<AstDecl> declList;         																						
+non terminal AstExp varDecExp;					 											
+non terminal ArrayList<AstFormal> funcArgOpt;														
+non terminal boolean negOpt	;						
+non terminal AstExp literal;													 																					
+non terminal AstStmtIf ifDef;
+non terminal AstStmtWhile whileDef;		
+		
+
 
 /***********************/
 /* OPERATOR PRECEDENCE */
@@ -130,19 +139,10 @@ start with program;
 /* DERIVATION RULES */
 /********************/
 					
-program 	::= 	program:p dec:d 
-					{: 
-						p.add(d); 
-						RESULT = p; 
-					:}
-					|
-					
-					{: 
-						RESULT = new AstProgram();
-					:}
-       			
-			;
+program ::= declList:l {: RESULT = new AstProgram(l); :};
 
+declList ::= declList:l dec:d {: l.add(d); RESULT = l; :}
+           | {: RESULT = new ArrayList<AstDecl>(); :};
 
 dec 		::=		varDec:v          {: RESULT = v; :}
 					| funcDec:f       {: RESULT = f; :}
@@ -225,7 +225,7 @@ exp			::=		var:v {: RESULT = new AstExpVar(v); :}
 					| callExp:c {: RESULT = c; :}
 					| literal:l {: RESULT = l; :}
 					;
-
+//TODO linenumber
 newExp 		::= 	NEW type:t {: RESULT = new AstNewExp(t, null); :} 
 					| NEW type:t LBRACK exp:e RBRACK {: RESULT = new AstNewExp(t, e); :} 
 					;
@@ -247,13 +247,15 @@ var			::=		ID:name								{: RESULT = new AstVarSimple(name);       :}
 whileDef	::=		WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE
 					{: RESULT = new AstStmtWhile(cond,body); :}
 					;
+ifDef		::=		IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtIf(   cond,body, null); :}
+					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE ELSE LBRACE stmtList:elseBody RBRACE	{: RESULT = new AstStmtIf(   cond,body, elseBody); :}
+					;					
 stmt		::=		varDec:v {: RESULT = v; :}
 					| var:v ASSIGN varDecExp:e SEMICOLON	{: RESULT = new AstStmtAssign(v,e); :}
 					| RETURN exp:e SEMICOLON {: RESULT = new AstReturnStmt(e); :}
 					| RETURN SEMICOLON {: RESULT = new AstReturnStmt(null); :}
-					| IF    LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtIf(   cond,body, null); :}
-					| IF    LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE ELSE LBRACE stmtList:elseBody RBRACE	{: RESULT = new AstStmtIf(   cond,body, elseBody); :}
-					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtWhile(cond,body); :}
+					| ifDef:i {: RESULT = i; :}
+					| whileDef:w {: RESULT = w; :}
 					| callExp:c SEMICOLON {: RESULT = new AstCallStmt(c); :}
 					;
  

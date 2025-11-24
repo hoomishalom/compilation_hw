@@ -5,11 +5,11 @@ public class AstProgram extends AstNode
 {
 	public List<AstDecl> declarations;
 	
-	public AstProgram()
+	public AstProgram(List<AstDecl> declarations)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
 		System.out.print("====================== program -> decls\n");
-		declarations = new java.util.ArrayList<>();
+		this.declarations = declarations;
 	}
 
 	public void add(AstDecl decl)
