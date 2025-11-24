@@ -97,15 +97,16 @@ non terminal AstDecl dec;
 non terminal AstProgram program;
 non terminal AstType type;
 non terminal AstVarDecl varDec;
-non terminal List<AstFormal> funcArgs;
+non terminal ArrayList<AstFormal> funcArgs;
 non terminal AstFuncDecl funcDec;
 non terminal AstClassDecl classDec;
 non terminal AstArrayDecl arrayTypedef;
-non terminal List<AstFormal> funcArgList;
+non terminal ArrayList<AstFormal> funcArgList;
 non terminal AstFormal funcArg;
-non terminal List<AstDecl> cFieldList;
+non terminal ArrayList<AstDecl> cFieldList;
 non terminal AstDecl cField;
-non terminal List<AstExp> comExpList;
+non terminal ArrayList<AstExp> comExpList;
+non terminal ArrayList<AstExp> comExpListOpt;
 non terminal AstExp newExp;
 non terminal AstCall callExp;
 non terminal String optionalId;
@@ -114,7 +115,7 @@ non terminal AstExp assExpOpt;
 non terminal ArrayList<AstDecl> declList;         																						
 non terminal AstExp varDecExp;					 											
 non terminal ArrayList<AstFormal> funcArgOpt;														
-non terminal boolean negOpt	;						
+non terminal Boolean negOpt	;						
 non terminal AstExp literal;													 																					
 non terminal AstStmtIf ifDef;
 non terminal AstStmtWhile whileDef;		
@@ -171,14 +172,14 @@ funcArg		::=		type:t ID:name {: RESULT = new AstFormal(t, name); :}
 					;
 
 funcArgs	::=		funcArgs:l COMMA funcArg:f {: l.add(f); RESULT = l; :}
-					| funcArg {: ArrayList l = new ArrayList<AstFormal>(); l.add(funcArg); RESULT = l; :}
+					| funcArg:f {: ArrayList l = new ArrayList<AstFormal>(); l.add(f); RESULT = l; :}
 					;
 
 funcArgOpt	::=		funcArgs:l {: RESULT = l; :}
 					| {: RESULT = new ArrayList<AstFormal>(); :}
 					;
 
-funcDec 	::= 	type:t ID:name LPAREN funcArgs:args RPAREN LBRACE stmtList:body RBRACE
+funcDec 	::= 	type:t ID:name LPAREN funcArgOpt:args RPAREN LBRACE stmtList:body RBRACE
 					{: RESULT = new AstFuncDecl(t, name, args, body); :}
 					;
 
@@ -232,11 +233,15 @@ newExp 		::= 	NEW type:t {: RESULT = new AstNewExp(t, null); :}
 
 
 comExpList	::=		comExpList:l COMMA exp:e {: l.add(e); RESULT = l; :}
-						| {: RESULT = new ArrayList<AstExp>(); :}
+						| exp:e {: ArrayList l = new ArrayList<AstExp>(); l.add(e); RESULT = l; :}
 						;
 
-callExp		::= 	ID:name LPAREN comExpList:args RPAREN {: RESULT = new AstCall(null, name, args); :}
-					| var:v DOT ID:name LPAREN comExpList:args RPAREN {: RESULT = new AstCall(v, name, args); :}
+comExpListOpt ::= comExpList:l {: RESULT = l; :}
+                | {: RESULT = new ArrayList<AstExp>(); :}
+                ;
+
+callExp		::= 	ID:name LPAREN comExpListOpt:args RPAREN {: RESULT = new AstCall(null, name, args); :}
+					| var:v DOT ID:name LPAREN comExpListOpt:args RPAREN {: RESULT = new AstCall(v, name, args); :}
 					;
 
 var			::=		ID:name								{: RESULT = new AstVarSimple(name);       :}

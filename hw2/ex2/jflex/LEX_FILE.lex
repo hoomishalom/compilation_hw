@@ -163,9 +163,7 @@ WrongCommentType2 = \/\*
 {ID}				{ return symbol(TokenNames.ID,     yytext());}
 {WhiteSpace}		{ /* just skip what was found, do nothing */ }
 <<EOF>>				{ return symbol(TokenNames.EOF);}
-{WRONG_INTEGER}		{ return symbol(TokenNames.NO_MATCH);}
-{WrongCommentType2} { return symbol(TokenNames.NO_MATCH);}
-.					{ return symbol(TokenNames.NO_MATCH);} /* . catches everything, NO_MATCH catch */
+{WRONG_INTEGER}		{ throw new RuntimeException("ERROR");}
+{WrongCommentType2} { throw new RuntimeException("ERROR");}
+.					{ throw new RuntimeException("ERROR");} /* . catches everything, NO_MATCH catch */
 }
-
-
