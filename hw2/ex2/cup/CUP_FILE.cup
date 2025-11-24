@@ -3,6 +3,7 @@
 /*************/
 import java_cup.runtime.*;
 import ast.*;
+import java.util.*;
 
 parser code 
 {:
@@ -65,7 +66,17 @@ terminal ASSIGN;
 terminal TYPE_INT;
 terminal TYPE_STRING;
 terminal TYPE_VOID;
-
+terminal LT;
+terminal GT;
+terminal NIL;
+terminal NEW;
+terminal CLASS;
+terminal EXTENDS;
+terminal ARRAY;
+terminal COMMA;
+terminal RETURN;
+terminal ELSE;
+terminal NO_MATCH;
 
 /*************/
 /* TERMINALS */
@@ -82,19 +93,38 @@ non terminal AstExp exp;
 non terminal AstVar var;
 non terminal AstStmt stmt;
 non terminal AstStmtList stmtList;
+non terminal AstDecl dec;
+non terminal AstProgram program;
+non terminal AstType type;
+non terminal AstVarDecl varDec;
+non terminal List<AstFormal> funcArgs;
+non terminal AstFuncDecl funcDec;
+non terminal AstClassDecl classDec;
+non terminal AstArrayDecl arrayTypedef;
+non terminal List<AstFormal> funcArgList;
+non terminal AstFormal funcArg;
+non terminal List<AstDecl> cFieldList;
+non terminal AstDecl cField;
+non terminal List<AstExp> comExpListOpt;
+non terminal List<AstExp> comExpList;
+non terminal AstExp newExp;
+non terminal AstCall callExp;
+non terminal String optionalId;
+non terminal AstExp assExpOpt;
 
 /***********************/
 /* OPERATOR PRECEDENCE */
 /***********************/
-precedence left PLUS;
-precedence left MINUS;
-precedence left TIMES;
-precedence left DIVIDE;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
+precedence left LT, GT, EQ;
+precedence left DOT;
+precedence left LBRACK;
 
 /************************/
 /* START WITH: stmtList */
 /************************/
-start with stmtList;
+start with program;
 
 /********************/
 /* DERIVATION RULES */
@@ -122,83 +152,99 @@ dec 		::=		varDec:v        {: RESULT = v; :}
 					| arrayTypedef:a  {: RESULT = a; :}
 					;
 
-type		::=		TYPE_INT		{: RESULT = new AstTypeInt(); 		:}
-					| TYPE_VOID		{: RESULT = new AstTypeVoid(); 		:}
-					| TYPE_STRING	{: RESULT = new AstTypeString(); 	:}
-					| ID:name		{: RESULT = new AstTypeClass(name); :}
+type		::=		TYPE_INT		{: RESULT = new AstType("int"); 		:}
+					| TYPE_VOID		{: RESULT = new AstType("void"); 		:}
+					| TYPE_STRING	{: RESULT = new AstType("string"); 	:}
+					| ID:name		{: RESULT = new AstType(name); :}
 					;
 
-
-assExpOpt 	::=		ASSIGN exp:e {: RESULT = e; :}
+varDecExp 	::=		exp:e {: RESULT = e; :}
+					| newExp:e {: RESULT = e; :}
+					;
+assExpOpt 	::=		ASSIGN varDecExp:e {: RESULT = e; :}
 					| {: RESULT = null; :}
 					;
-varDec		::= 	type:t ID:name assExpOpt:e SEMICOLON {: RESULT = new AstVarDec(t, name, e); :}
-					| type:t ID:name ASSIGN newExp:e SEMICOLON
-					{: RESULT = new AstVarDec(t, name, e); :}
+
+varDec		::= 	type:t ID:name assExpOpt:e SEMICOLON {: RESULT = new AstVarDecl(t, name, e); :}
 					;
 
 
-funcArg		::=		type ID:name 
-					;
-funcArgList	::=		funcArg COMMA funcArgList // TODO: make list
-					| funcArg					
-					;
-funcDec 	::= 	type:t ID:name LPAREN funcArgList:args RPAREN LBRACE stmtList:body RBRACE
+funcArg		::=		type:t ID:name {: RESULT = new AstFormal(t, name); :}
 					;
 
-// TODO: make list
-stmtList	::=		stmt:s	stmtList:l		{: RESULT = new AstStmtList(s,l);    :}
-					| stmt:s				{: RESULT = new AstStmtList(s,null); :}
+funcArgs	::=		funcArgs:l COMMA funcArg:f {: l.add(f); RESULT = l; :}
+					| funcArg:f {: List<AstFormal> l = new ArrayList<>(); l.add(f); RESULT = l; :}
 					;
 
-cField		::=		varDec 
-					| funcDec
-					;
-// TODO: make list
-cFieldList	::=		cField cFieldList
-					| cField
-					;
-optionalId	::= 	EXTENDS ID
-					| 
-					;
-classDec	::= 	CLASS ID optionalId LBRACE cFieldList RBRACE
+funcArgOpt	::=		funcArgs:l {: RESULT = l; :}
+					| {: RESULT = new ArrayList<AstFormal>(); :}
 					;
 
-arrayTypedef ::=	ARRAY ID EQ type LBRACK RBRACK SEMICOLON
-		
-operator 	::= 	PLUS	
-					| MINUS
-					| TIMES
-					| DIVIDE
-					| LT
-					| GT
-					| EQ
+funcDec 	::= 	type:t ID:name LPAREN funcArgOpt:args RPAREN LBRACE stmtList:body RBRACE
+					{: RESULT = new AstFuncDecl(t, name, args, body); :}
 					;
-minusOpt	::= 	MINUS
-					| 
+
+stmtList	::=		stmtList:l stmt:s		{: l.statements.add(s); RESULT = l;    :}
+					| {: RESULT = new AstStmtList(); :}
 					;
-minusType	::=		INT 
-					| NIL
-					| STRING
+
+cField		::=		varDec:v {: RESULT = v; :}
+					| funcDec:f {: RESULT = f; :}
 					;
-exp			::=		var LPAREN exp:e RPAREN {: RESULT = e;:}
-					| exp operator exp
-					| callExp
-					| var:v								{: RESULT = new AstExpVar(v);          :}
-					| minOpt minusType
+
+cFieldList	::=		cFieldList:l cField:f {: l.add(f); RESULT = l; :}
+					| {: RESULT = new ArrayList<AstDecl>(); :}
 					;
-newExp 		::= 	NEW type:name {:RESULT = new AstClassDecl():} 
-					| NEW type:name LBRACK exp:args RBRACK {:RESULT = new AstClassDecl():} 
+
+optionalId	::= 	EXTENDS ID:id {: RESULT = id; :}
+					| {: RESULT = null; :}
+					;
+
+classDec	::= 	CLASS ID:name optionalId:superName LBRACE cFieldList:fields RBRACE
+					{: RESULT = new AstClassDecl(name, superName, fields); :}
+					;
+
+arrayTypedef ::=	ARRAY ID:name EQ type:t LBRACK RBRACK SEMICOLON
+					{: RESULT = new AstArrayDecl(t, name); :}
+					;
+
+operator	::=		PLUS	{: RESULT = AstExpBinop.OP.PLUS; 	:}
+					| MINUS	{: RESULT = AstExpBinop.OP.MINUS; 	:}
+					| TIMES	{: RESULT = AstExpBinop.OP.TIMES; 	:}
+					| DIVIDE {: RESULT = AstExpBinop.OP.DIVIDE; 	:}
+					| LT	{: RESULT = AstExpBinop.OP.LT; 		:}
+					| GT	{: RESULT = AstExpBinop.OP.GT; 		:}
+					| EQ	{: RESULT = AstExpBinop.OP.EQ; 		:}
+					;
+literal		::= 	INT:i    {: RESULT = new AstExpInt(i);     :}
+					| STRING:s {: RESULT = new AstExpString(s);  :}
+					| NIL      {: RESULT = new AstExpNil();      :}
+					;
+literalNegOpt ::=		literal  /* TODO we need to implement negation but I dont know how to do the AST object of a negated string */
+					;
+exp			::=		var:v {: RESULT = new AstExpVar(v); :}
+					| LPAREN exp:e RPAREN {: RESULT = e; :}
+					| exp:e1 operator:op exp:e2 {: RESULT = new AstExpBinop(e1, e2, op); :}
+					| callExp:c {: RESULT = c; :}
+					| literalNegOpt:l {: RESULT = l; :}
+					;
+
+newExp 		::= 	NEW type:t {: RESULT = new AstNewExp(t, null); :} 
+					| NEW type:t LBRACK exp:e RBRACK {: RESULT = new AstNewExp(t, e); :} 
 					;
 
 
-varDotOpt	::=		var DOT
-					| 
-					;
-comExpListOpt	::=		COMMA exp // TODO: make list
-						|
+comExpListOpt	::=		comExpList:l {: RESULT = l; :}
+						| {: RESULT = new ArrayList<AstExp>(); :}
 						;
-callExp		::= 	varDotOpt ID LPAREN 
+
+comExpList	::=		comExpList:l COMMA exp:e {: l.add(e); RESULT = l; :}
+						| exp:e {: List<AstExp> l = new ArrayList<>(); l.add(e); RESULT = l; :}
+						;
+
+callExp		::= 	ID:name LPAREN comExpListOpt:args RPAREN {: RESULT = new AstCall(null, name, args); :}
+					| var:v DOT ID:name LPAREN comExpListOpt:args RPAREN {: RESULT = new AstCall(v, name, args); :}
+					;
 
 var			::=		ID:name								{: RESULT = new AstVarSimple(name);       :}
 					| var:v DOT ID:fieldName			{: RESULT = new AstVarField(v,fieldName); :}
@@ -206,8 +252,13 @@ var			::=		ID:name								{: RESULT = new AstVarSimple(name);       :}
 					;
 					
 stmt		::=		var:v ASSIGN exp:e SEMICOLON								{: RESULT = new AstStmtAssign(v,e); :}
-					| IF    LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtIf(   cond,body); :}
+					| IF    LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtIf(   cond,body, null); :}
+					| IF    LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE ELSE LBRACE stmtList:elseBody RBRACE	{: RESULT = new AstStmtIf(   cond,body, elseBody); :}
 					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtWhile(cond,body); :}
+					| RETURN exp:e SEMICOLON {: RESULT = new AstReturnStmt(e); :}
+					| RETURN SEMICOLON {: RESULT = new AstReturnStmt(null); :}
+					| callExp:c SEMICOLON {: RESULT = new AstCallStmt(c); :}
+					| varDec:v {: RESULT = v; :}
 					;
  
 
