@@ -16,4 +16,3 @@ public class AstType extends AstNode
 		System.out.print("AST NODE TYPE( " + typeName + " )\n");
 	}
 }
-// **

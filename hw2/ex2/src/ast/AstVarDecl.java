@@ -1,6 +1,6 @@
 package ast;
 
-public class AstVarDecl extends AstStmt
+public class AstVarDecl extends AstDecl
 {
 	public AstType type;
 	public String name;
@@ -26,4 +26,3 @@ public class AstVarDecl extends AstStmt
 		if (initialValue != null) initialValue.printMe();
 	}
 }
-// **

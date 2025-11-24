@@ -9,6 +9,7 @@ public class AstProgram extends AstNode
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
 		System.out.print("====================== program -> decls\n");
+		declarations = new java.util.ArrayList<>();
 	}
 
 	public void add(AstDecl decl)
