@@ -115,9 +115,9 @@ non terminal AstExp assExpOpt;
 /***********************/
 /* OPERATOR PRECEDENCE */
 /***********************/
-precedence left PLUS, MINUS;
-precedence left TIMES, DIVIDE;
 precedence left LT, GT, EQ;
+precedence left PLUS,MINUS;
+precedence left TIMES, DIVIDE;
 precedence left DOT;
 precedence left LBRACK;
 
@@ -130,29 +130,27 @@ start with program;
 /* DERIVATION RULES */
 /********************/
 					
-program 	::= 	dec:d
-					{: 
-						AstProgram p = new AstProgram();
-						p.add(d); 
-						RESULT = p; 
-					:}
-    
-    		| 
-        			program:p dec:d 
+program 	::= 	program:p dec:d 
 					{: 
 						p.add(d); 
 						RESULT = p; 
 					:}
+					|
+					
+					{: 
+						RESULT = new AstProgram();
+					:}
+       			
 			;
 
 
-dec 		::=		varDec:v        {: RESULT = v; :}
+dec 		::=		varDec:v          {: RESULT = v; :}
 					| funcDec:f       {: RESULT = f; :}
 					| classDec:c      {: RESULT = c; :}
 					| arrayTypedef:a  {: RESULT = a; :}
 					;
 
-type		::=		TYPE_INT		{: RESULT = new AstType("int"); 		:}
+type		::=		TYPE_INT		{: RESULT = new AstType("int"); 		:} // TODO maybe split to dedicated classes
 					| TYPE_VOID		{: RESULT = new AstType("void"); 		:}
 					| TYPE_STRING	{: RESULT = new AstType("string"); 	:}
 					| ID:name		{: RESULT = new AstType(name); :}
@@ -173,14 +171,14 @@ funcArg		::=		type:t ID:name {: RESULT = new AstFormal(t, name); :}
 					;
 
 funcArgs	::=		funcArgs:l COMMA funcArg:f {: l.add(f); RESULT = l; :}
-					| funcArg:f {: List<AstFormal> l = new ArrayList<>(); l.add(f); RESULT = l; :}
+					| funcArg {: ArrayList l = new ArrayList<AstFormal>(); l.add(funcArg); RESULT = l; :}
 					;
 
 funcArgOpt	::=		funcArgs:l {: RESULT = l; :}
 					| {: RESULT = new ArrayList<AstFormal>(); :}
 					;
 
-funcDec 	::= 	type:t ID:name LPAREN funcArgOpt:args RPAREN LBRACE stmtList:body RBRACE
+funcDec 	::= 	type:t ID:name LPAREN funcArgs:args RPAREN LBRACE stmtList:body RBRACE
 					{: RESULT = new AstFuncDecl(t, name, args, body); :}
 					;
 
@@ -208,25 +206,24 @@ arrayTypedef ::=	ARRAY ID:name EQ type:t LBRACK RBRACK SEMICOLON
 					{: RESULT = new AstArrayDecl(t, name); :}
 					;
 
-operator	::=		PLUS	{: RESULT = AstExpBinop.OP.PLUS; 	:}
-					| MINUS	{: RESULT = AstExpBinop.OP.MINUS; 	:}
-					| TIMES	{: RESULT = AstExpBinop.OP.TIMES; 	:}
-					| DIVIDE {: RESULT = AstExpBinop.OP.DIVIDE; 	:}
-					| LT	{: RESULT = AstExpBinop.OP.LT; 		:}
-					| GT	{: RESULT = AstExpBinop.OP.GT; 		:}
-					| EQ	{: RESULT = AstExpBinop.OP.EQ; 		:}
+negOpt		::=		MINUS	{: RESULT = true; 	:}
+					| {: RESULT = false; :}
 					;
-literal		::= 	INT:i    {: RESULT = new AstExpInt(i);     :}
+literal		::= 	negOpt:n INT:i    {: RESULT = new AstExpInt(i,n); :}
 					| STRING:s {: RESULT = new AstExpString(s);  :}
 					| NIL      {: RESULT = new AstExpNil();      :}
 					;
-literalNegOpt ::=		literal  /* TODO we need to implement negation but I dont know how to do the AST object of a negated string */
-					;
 exp			::=		var:v {: RESULT = new AstExpVar(v); :}
 					| LPAREN exp:e RPAREN {: RESULT = e; :}
-					| exp:e1 operator:op exp:e2 {: RESULT = new AstExpBinop(e1, e2, op); :}
+					| exp:e1 LT:op exp:e2 {: RESULT = new AstExpBinop(e1, e2, AstExpBinop.OP.LT); :}
+					| exp:e1 GT:op exp:e2 {: RESULT = new AstExpBinop(e1, e2, AstExpBinop.OP.GT); :}
+					| exp:e1 EQ:op exp:e2 {: RESULT = new AstExpBinop(e1, e2, AstExpBinop.OP.EQ); :}
+					| exp:e1 PLUS:op exp:e2 {: RESULT = new AstExpBinop(e1, e2, AstExpBinop.OP.PLUS); :}
+					| exp:e1 MINUS:op exp:e2 {: RESULT = new AstExpBinop(e1, e2, AstExpBinop.OP.MINUS); :}
+					| exp:e1 TIMES:op exp:e2 {: RESULT = new AstExpBinop(e1, e2, AstExpBinop.OP.TIMES); :}
+					| exp:e1 DIVIDE:op exp:e2 {: RESULT = new AstExpBinop(e1, e2, AstExpBinop.OP.DIVIDE); :}
 					| callExp:c {: RESULT = c; :}
-					| literalNegOpt:l {: RESULT = l; :}
+					| literal:l {: RESULT = l; :}
 					;
 
 newExp 		::= 	NEW type:t {: RESULT = new AstNewExp(t, null); :} 
@@ -234,31 +231,30 @@ newExp 		::= 	NEW type:t {: RESULT = new AstNewExp(t, null); :}
 					;
 
 
-comExpListOpt	::=		comExpList:l {: RESULT = l; :}
+comExpList	::=		comExpList:l COMMA exp:e {: l.add(e); RESULT = l; :}
 						| {: RESULT = new ArrayList<AstExp>(); :}
 						;
 
-comExpList	::=		comExpList:l COMMA exp:e {: l.add(e); RESULT = l; :}
-						| exp:e {: List<AstExp> l = new ArrayList<>(); l.add(e); RESULT = l; :}
-						;
-
-callExp		::= 	ID:name LPAREN comExpListOpt:args RPAREN {: RESULT = new AstCall(null, name, args); :}
-					| var:v DOT ID:name LPAREN comExpListOpt:args RPAREN {: RESULT = new AstCall(v, name, args); :}
+callExp		::= 	ID:name LPAREN comExpList:args RPAREN {: RESULT = new AstCall(null, name, args); :}
+					| var:v DOT ID:name LPAREN comExpList:args RPAREN {: RESULT = new AstCall(v, name, args); :}
 					;
 
 var			::=		ID:name								{: RESULT = new AstVarSimple(name);       :}
 					| var:v DOT ID:fieldName			{: RESULT = new AstVarField(v,fieldName); :}
 					| var:v LBRACK exp:e RBRACK			{: RESULT = new AstVarSubscript(v,e);     :}
 					;
-					
-stmt		::=		var:v ASSIGN exp:e SEMICOLON								{: RESULT = new AstStmtAssign(v,e); :}
+
+whileDef	::=		WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE
+					{: RESULT = new AstStmtWhile(cond,body); :}
+					;
+stmt		::=		varDec:v {: RESULT = v; :}
+					| var:v ASSIGN varDecExp:e SEMICOLON	{: RESULT = new AstStmtAssign(v,e); :}
+					| RETURN exp:e SEMICOLON {: RESULT = new AstReturnStmt(e); :}
+					| RETURN SEMICOLON {: RESULT = new AstReturnStmt(null); :}
 					| IF    LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtIf(   cond,body, null); :}
 					| IF    LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE ELSE LBRACE stmtList:elseBody RBRACE	{: RESULT = new AstStmtIf(   cond,body, elseBody); :}
 					| WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtWhile(cond,body); :}
-					| RETURN exp:e SEMICOLON {: RESULT = new AstReturnStmt(e); :}
-					| RETURN SEMICOLON {: RESULT = new AstReturnStmt(null); :}
 					| callExp:c SEMICOLON {: RESULT = new AstCallStmt(c); :}
-					| varDec:v {: RESULT = v; :}
 					;
  
 
