@@ -2,7 +2,6 @@
 # DIRECTORIES #
 ###############
 BASEDIR           = $(shell pwd)
-echo ${BASEDIR}
 JFlex_DIR         = ${BASEDIR}/jflex
 CUP_DIR           = ${BASEDIR}/cup
 SRC_DIR           = ${BASEDIR}/src
@@ -57,6 +56,7 @@ OUTPUT   = ${OUTPUT_DIR}/ParseStatus.txt
 ##########
 all:
 	clear
+	@echo ${BASEDIR}
 	@echo "*****************************"
 	@echo "*                           *"
 	@echo "*                           *"
