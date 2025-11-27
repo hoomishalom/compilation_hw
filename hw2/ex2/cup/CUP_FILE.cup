@@ -226,7 +226,7 @@ exp			::=		var:v {: RESULT = new AstExpVar(v); :}
 					| callExp:c {: RESULT = c; :}
 					| literal:l {: RESULT = l; :}
 					;
-//TODO linenumber
+
 newExp 		::= 	NEW type:t {: RESULT = new AstNewExp(t, null); :} 
 					| NEW type:t LBRACK exp:e RBRACK {: RESULT = new AstNewExp(t, e); :} 
 					;
