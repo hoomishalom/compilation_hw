@@ -153,11 +153,11 @@ WrongCommentType2 = \/\*
     try {
         int value = Integer.parseInt(yytext());
         if (value > 32767) {
-            return symbol(TokenNames.NO_MATCH);
+            throw new RuntimeException("ERROR");
         }
         return symbol(TokenNames.INT, Integer.valueOf(yytext()));
     } catch (NumberFormatException e) {
-        return symbol(TokenNames.NO_MATCH);
+        throw new RuntimeException("ERROR");
     }
                     }
 {ID}				{ return symbol(TokenNames.ID,     yytext());}
