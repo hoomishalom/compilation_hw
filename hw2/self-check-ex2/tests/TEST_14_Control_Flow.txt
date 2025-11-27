@@ -1,0 +1,17 @@
+void main() {
+    int i := 0;
+    while (i < 10) {
+        if (i < 5) {
+            int x := i;
+        } else {
+            int y := i;
+        }
+        i := i + 1;
+    }
+    
+    if (1 = 1) {
+        if (2 = 2) {
+            int z := 3;
+        }
+    }
+}
