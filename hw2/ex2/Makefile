@@ -2,6 +2,7 @@
 # DIRECTORIES #
 ###############
 BASEDIR           = $(shell pwd)
+echo ${BASEDIR}
 JFlex_DIR         = ${BASEDIR}/jflex
 CUP_DIR           = ${BASEDIR}/cup
 SRC_DIR           = ${BASEDIR}/src
