@@ -56,6 +56,7 @@ OUTPUT   = ${OUTPUT_DIR}/ParseStatus.txt
 ##########
 all:
 	clear
+	@echo ${BASEDIR}
 	@echo "*****************************"
 	@echo "*                           *"
 	@echo "*                           *"
