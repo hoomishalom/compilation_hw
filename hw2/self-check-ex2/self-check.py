@@ -96,7 +96,8 @@ def run_test(test_path, output_dir, executable_file):
     try:
         process = subprocess.run(
             ["java", "-jar", str(executable_file.resolve()), str(test_path.resolve()), str(output_path)],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=10
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=10,
+            cwd=str(EXERCISE_DIR)
         )
     
     except subprocess.TimeoutExpired:
@@ -119,6 +120,8 @@ def run_test(test_path, output_dir, executable_file):
             print("OK")
         else:
             print("FAILED")
+            print(f"Expected:\n{content2}")
+            print(f"Got:\n{content1}")
             raise RuntimeError("Test failed") 
 
 
@@ -160,7 +163,7 @@ def main():
         unzip_single_archive()
         output_dir, executable_file = setup_self_check()
         run_all_tests(output_dir, executable_file)
-
+        
     except Exception as e:
         print("--- SELF-CHECK FAILED ---")
         print(f"ERROR: {e}")
