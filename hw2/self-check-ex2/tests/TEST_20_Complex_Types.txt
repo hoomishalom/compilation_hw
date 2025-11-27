@@ -1,0 +1,10 @@
+array IntArr = int[];
+class A {
+    IntArr arr;
+}
+
+void main() {
+    A a := new A;
+    a.arr := new int[5];
+    a.arr[0] := 1;
+}

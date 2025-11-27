@@ -1,0 +1,18 @@
+void main() {
+    int a := 1 + 2 * 3;
+    int b := (1 + 2) * 3;
+    int c := 10 / 2 - 3;
+    int d := 10 / (2 - 3);
+    int e := -5;
+    int f := 1 < 2;
+    int g := 1 > 2;
+    int h := 1 = 1;
+    
+    if (a < b) {
+        int x := 1;
+    }
+    
+    if (a + b * c > d) {
+        int y := 2;
+    }
+}

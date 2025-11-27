@@ -1,0 +1,18 @@
+class Animal {
+    int legs;
+    void walk() {
+        legs := 4;
+    }
+}
+
+class Dog extends Animal {
+    void bark() {
+        walk();
+    }
+}
+
+void main() {
+    Dog d := new Dog;
+    d.bark();
+    d.legs := 3;
+}
