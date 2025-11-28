@@ -1,9 +1,10 @@
 BASEDIR=$(pwd)
 SRC_DIR=${BASEDIR}/src
 BIN_DIR=${BASEDIR}/bin
+JBIN_DIR=${BASEDIR}/java_bin
 OUT_DIR=${BASEDIR}/output
 JFlex_GENERATED_FILE= ${SRC_DIR}/Lexer.java
 CUP_GENERATED_FILES=${SRC_DIR}/Parser.java ${SRC_DIR}/TokenNames.java
 JFlex_CUP_GENERATED_FILES=${JFlex_GENERATED_FILE} ${CUP_GENERATED_FILES}
 rm -rf PARSER
-rm -rf ${JFlex_CUP_GENERATED_FILES} ${BIN_DIR}/*.class ${BIN_DIR}/*/*.class ${OUT_DIR}/*
+rm -rf ${JFlex_CUP_GENERATED_FILES} ${BIN_DIR}/* ${JBIN_DIR}/* ${OUT_DIR}/*
