@@ -16,7 +16,8 @@ parser code
 	}
 	public void report_error(String message, Object info)
 	{
-		throw new RuntimeException("ERROR(" + lexer.getLine() + ")");
+        java_cup.runtime.Symbol s = (java_cup.runtime.Symbol) info;
+		throw new RuntimeException("ERROR(" + (s.left + 1) + ")"); // left + 1 is the line number
 	}
 :}
 
@@ -27,12 +28,6 @@ scan with
 {:
 	Symbol s;
 	s = lexer.next_token();
-	//System.out.print(s.sym);
-	System.out.print("[");
-	System.out.print(lexer.getLine());
-	System.out.print(":");
-	System.out.print(lexer.getTokenStartPosition());
-	System.out.print("] ");
 	System.out.print(TokenNames.terminalNames[s.sym]);
 	if (s.value != null)
 	{
@@ -40,6 +35,12 @@ scan with
 		System.out.print(s.value);
 		System.out.print(" )");
 	}
+	System.out.print("[");
+	System.out.print(lexer.getLine());
+	System.out.print(":");
+	System.out.print(lexer.getTokenStartPosition());
+	System.out.print("] ");
+	System.out.print(s.sym);
 	System.out.print("\n");
 	return s; 
 :};
@@ -76,7 +77,6 @@ terminal ARRAY;
 terminal COMMA;
 terminal RETURN;
 terminal ELSE;
-terminal NO_MATCH;
 
 /*************/
 /* TERMINALS */
@@ -124,11 +124,14 @@ non terminal AstStmtWhile whileDef;
 /***********************/
 /* OPERATOR PRECEDENCE */
 /***********************/
-precedence left LT, GT, EQ;
-precedence left PLUS,MINUS;
+precedence left ASSIGN; 
+precedence left EQ;
+precedence left LT, GT;
+precedence left PLUS, MINUS;
 precedence left TIMES, DIVIDE;
-precedence left DOT;
 precedence left LBRACK;
+precedence left LPAREN;
+precedence left DOT;
 
 /************************/
 /* START WITH: stmtList */
@@ -206,10 +209,8 @@ arrayTypedef ::=	ARRAY ID:name EQ type:t LBRACK RBRACK SEMICOLON
 					{: RESULT = new AstArrayDecl(t, name); :}
 					;
 
-negOpt		::=		MINUS	{: RESULT = true; 	:}
-					| {: RESULT = false; :}
-					;
-literal		::= 	negOpt:n INT:i    {: RESULT = new AstExpInt(i,n); :}
+literal		::= 	INT:i    {: RESULT = new AstExpInt(i);     :}
+                    | MINUS INT:i {: RESULT = new AstExpNegInt(i); :}
 					| STRING:s {: RESULT = new AstExpString(s);  :}
 					| NIL      {: RESULT = new AstExpNil();      :}
 					;
@@ -235,9 +236,9 @@ comExpList	::=		comExpList:l COMMA exp:e {: l.add(e); RESULT = l; :}
 						| exp:e {: ArrayList l = new ArrayList<AstExp>(); l.add(e); RESULT = l; :}
 						;
 
-comExpListOpt ::= comExpList:l {: RESULT = l; :}
-                | {: RESULT = new ArrayList<AstExp>(); :}
-                ;
+comExpListOpt ::=   comExpList:l {: RESULT = l; :}
+                    | {: RESULT = new ArrayList<AstExp>(); :}
+                    ;
 
 callExp		::= 	ID:name LPAREN comExpListOpt:args RPAREN {: RESULT = new AstCall(null, name, args); :}
 					| var:v DOT ID:name LPAREN comExpListOpt:args RPAREN {: RESULT = new AstCall(v, name, args); :}
