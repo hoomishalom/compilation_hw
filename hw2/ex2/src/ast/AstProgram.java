@@ -18,13 +18,20 @@ public class AstProgram extends AstNode
 	}
 	
 	@Override
-	public void printMe()
-	{
-		System.out.print("AST NODE PROGRAM\n");
-		if (declarations != null) {
-			for (AstDecl d : declarations) {
-				d.printMe();
-			}
-		}
-	}
+    public void printMe()
+    {
+        System.out.print("AST NODE PROGRAM\n");
+
+        AstGraphviz.getInstance().logNode(
+            serialNumber,
+            "PROGRAM\n");
+
+        if (declarations != null) {
+            for (AstDecl d : declarations) {
+                d.printMe();
+                
+                AstGraphviz.getInstance().logEdge(serialNumber, d.serialNumber);
+            }
+        }
+    }
 }

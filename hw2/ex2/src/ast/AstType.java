@@ -14,5 +14,8 @@ public class AstType extends AstNode
 	public void printMe()
 	{
 		System.out.print("AST NODE TYPE( " + typeName + " )\n");
+        AstGraphviz.getInstance().logNode(
+            serialNumber,
+            "TYPE\n(" + typeName + ")\n");
 	}
 }

@@ -4,10 +4,10 @@ public class AstExpInt extends AstExp
 {
 	public int value;
 
-	public AstExpInt(int value, boolean hasMinus)
+	public AstExpInt(int value)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
-		this.value = hasMinus ? -value : value;
+		this.value = value;
 	}
 
 	public void printMe()
