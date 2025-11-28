@@ -187,7 +187,7 @@ funcDec 	::= 	type:t ID:name LPAREN funcArgOpt:args RPAREN LBRACE stmtList:body 
 					;
 
 stmtList	::=		stmtList:l stmt:s		{: l.statements.add(s); RESULT = l;    :}
-					| stmt:s {: ArrayList<AstStmt> l = new ArrayList<AstStmt>(); l.add(s); RESULT = l; :}
+					| stmt:s {: AstStmtList l = new AstStmtList(); l.statements.add(s); RESULT = l; :}
 					;
 
 cField		::=		varDec:v {: RESULT = v; :}
