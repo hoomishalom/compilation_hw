@@ -36,27 +36,7 @@ public class Main
 			/*******************************/
 			/* [4] Initialize a new parser */
 			/*******************************/
-
-			/* [INTERCEPTION] Create a wrapper that logs tokens */
-			java_cup.runtime.Scanner interceptingLexer = new java_cup.runtime.Scanner() {
-				@Override
-				public java_cup.runtime.Symbol next_token() throws Exception {
-					// 1. Get the token from the real lexer
-					java_cup.runtime.Symbol symbol = l.next_token();
-					
-					// 2. INTERCEPT: Print/Inspect the token here
-					// 'sym' is the integer ID, 'value' is the actual string/object
-					
-					
-					// 3. Pass it along to the parser
-					return symbol;
-				}
-			};
-
-			/* [5] Initialize the Parser with the INTERCEPTOR, not the original lexer */
-			p = new Parser(interceptingLexer);
-
-
+			p = new Parser(l);
 
 			/***********************************/
 			/* [5] 3 ... 2 ... 1 ... Parse !!! */
@@ -75,6 +55,7 @@ public class Main
 				fileWriter.print("OK");
 			} catch (Exception e) {
 				fileWriter.print(e.getMessage());
+				// fileWriter.print("meow\n");
 			} finally {
 				fileWriter.close();
 			}
