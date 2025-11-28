@@ -145,7 +145,7 @@ start with program;
 program ::= declList:l {: RESULT = new AstProgram(l); :};
 
 declList ::= declList:l dec:d {: l.add(d); RESULT = l; :}
-           | {: RESULT = new ArrayList<AstDecl>(); :};
+           | dec:d {: ArrayList<AstDecl> l = new ArrayList<AstDecl>(); l.add(d); RESULT = l; :};
 
 dec 		::=		varDec:v          {: RESULT = v; :}
 					| funcDec:f       {: RESULT = f; :}
