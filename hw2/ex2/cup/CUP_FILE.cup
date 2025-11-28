@@ -101,6 +101,7 @@ non terminal AstFuncDecl funcDec;
 non terminal AstClassDecl classDec;
 non terminal AstArrayDecl arrayTypedef;
 non terminal ArrayList<AstFormal> funcArgList;
+non terminal AstStmtList elseOpt;
 non terminal AstFormal funcArg;
 non terminal ArrayList<AstDecl> cFieldList;
 non terminal AstDecl cField;
@@ -186,7 +187,7 @@ funcDec 	::= 	type:t ID:name LPAREN funcArgOpt:args RPAREN LBRACE stmtList:body 
 					;
 
 stmtList	::=		stmtList:l stmt:s		{: l.statements.add(s); RESULT = l;    :}
-					| {: RESULT = new AstStmtList(); :}
+					| stmt:s {: ArrayList<AstStmt> l = new ArrayList<AstStmt>(); l.add(s); RESULT = l; :}
 					;
 
 cField		::=		varDec:v {: RESULT = v; :}
@@ -194,7 +195,7 @@ cField		::=		varDec:v {: RESULT = v; :}
 					;
 
 cFieldList	::=		cFieldList:l cField:f {: l.add(f); RESULT = l; :}
-					| {: RESULT = new ArrayList<AstDecl>(); :}
+					| cField:f {: ArrayList<AstDecl> l = new ArrayList<AstDecl>(); l.add(f); RESULT = l; :}
 					;
 
 optionalId	::= 	EXTENDS ID:id {: RESULT = id; :}
@@ -252,9 +253,12 @@ var			::=		ID:name								{: RESULT = new AstVarSimple(name);       :}
 whileDef	::=		WHILE LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE
 					{: RESULT = new AstStmtWhile(cond,body); :}
 					;
-ifDef		::=		IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE	{: RESULT = new AstStmtIf(   cond,body, null); :}
-					| IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE ELSE LBRACE stmtList:elseBody RBRACE	{: RESULT = new AstStmtIf(   cond,body, elseBody); :}
-					;					
+ifDef		::=		IF LPAREN exp:cond RPAREN LBRACE stmtList:body RBRACE elseOpt:e	{: RESULT = new AstStmtIf(   cond,body, e); :}
+					;
+					
+elseOpt		::=		ELSE LBRACE stmtList:elseBody RBRACE {: RESULT = elseBody; :}
+					| {: RESULT = null; :}
+					;
 stmt		::=		varDec:v {: RESULT = v; :}
 					| var:v ASSIGN varDecExp:e SEMICOLON	{: RESULT = new AstStmtAssign(v,e); :}
 					| RETURN exp:e SEMICOLON {: RESULT = new AstReturnStmt(e); :}
