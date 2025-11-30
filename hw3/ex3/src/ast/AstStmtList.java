@@ -1,73 +1,38 @@
 package ast;
 
-import types.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AstStmtList extends AstNode
 {
-	/****************/
-	/* DATA MEMBERS */
-	/****************/
-	public AstStmt head;
-	public AstStmtList tail;
+	public List<AstStmt> statements;
 
-	/******************/
-	/* CONSTRUCTOR(S) */
-	/******************/
-	public AstStmtList(AstStmt head, AstStmtList tail)
+	public AstStmtList()
 	{
-		/******************************/
-		/* SET A UNIQUE SERIAL NUMBER */
-		/******************************/
 		serialNumber = AstNodeSerialNumber.getFresh();
-
-		/***************************************/
-		/* PRINT CORRESPONDING DERIVATION RULE */
-		/***************************************/
-		if (tail != null) System.out.print("====================== stmts -> stmt stmts\n");
-		if (tail == null) System.out.print("====================== stmts -> stmt      \n");
-
-		/*******************************/
-		/* COPY INPUT DATA MEMBERS ... */
-		/*******************************/
-		this.head = head;
-		this.tail = tail;
+		statements = new ArrayList<>();
 	}
 
-	/******************************************************/
-	/* The printing message for a statement list AST node */
-	/******************************************************/
+	public void add(AstStmt stmt)
+	{
+		statements.add(stmt);
+	}
+
 	public void printMe()
 	{
-		/**************************************/
-		/* AST NODE TYPE = AST STATEMENT LIST */
-		/**************************************/
 		System.out.print("AST NODE STMT LIST\n");
+		for (AstStmt s : statements)
+		{
+			if (s != null) s.printMe();
+		}
 
-		/*************************************/
-		/* RECURSIVELY PRINT HEAD + TAIL ... */
-		/*************************************/
-		if (head != null) head.printMe();
-		if (tail != null) tail.printMe();
-
-		/**********************************/
-		/* PRINT to AST GRAPHVIZ DOT file */
-		/**********************************/
 		AstGraphviz.getInstance().logNode(
-				serialNumber,
+			serialNumber,
 			"STMT\nLIST\n");
 		
-		/****************************************/
-		/* PRINT Edges to AST GRAPHVIZ DOT file */
-		/****************************************/
-		if (head != null) AstGraphviz.getInstance().logEdge(serialNumber,head.serialNumber);
-		if (tail != null) AstGraphviz.getInstance().logEdge(serialNumber,tail.serialNumber);
-	}
-	
-	public Type semantMe()
-	{
-		if (head != null) head.semantMe();
-		if (tail != null) tail.semantMe();
-		
-		return null;
+		for (AstStmt s : statements)
+		{
+			if (s != null) AstGraphviz.getInstance().logEdge(serialNumber, s.serialNumber);
+		}
 	}
 }
