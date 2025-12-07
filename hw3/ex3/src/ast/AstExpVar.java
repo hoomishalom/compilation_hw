@@ -4,9 +4,10 @@ public class AstExpVar extends AstExp
 {
 	public AstVar var;
 
-	public AstExpVar(AstVar var)
+	public AstExpVar(AstVar var, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.var = var;
 	}
 

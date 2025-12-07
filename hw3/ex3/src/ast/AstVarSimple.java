@@ -10,12 +10,13 @@ public class AstVarSimple extends AstVar
 	/******************/
 	/* CONSTRUCTOR(S) */
 	/******************/
-	public AstVarSimple(String name)
+	public AstVarSimple(String name, int lineNumber)
 	{
 		/******************************/
 		/* SET A UNIQUE SERIAL NUMBER */
 		/******************************/
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 	
 		/***************************************/
 		/* PRINT CORRESPONDING DERIVATION RULE */

@@ -5,9 +5,10 @@ public class AstFormal extends AstNode
 	public AstType type;
 	public String name;
 
-	public AstFormal(AstType type, String name)
+	public AstFormal(AstType type, String name, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.type = type;
 		this.name = name;
 	}

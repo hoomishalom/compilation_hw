@@ -4,9 +4,10 @@ public class AstExpInt extends AstExp
 {
 	public int value;
 
-	public AstExpInt(int value)
+	public AstExpInt(int value, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.value = value;
 	}
 

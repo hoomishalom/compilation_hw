@@ -4,9 +4,10 @@ public class AstCallStmt extends AstStmt
 {
 	public AstCall call;
 
-	public AstCallStmt(AstCall call)
+	public AstCallStmt(AstCall call, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.call = call;
 	}
 

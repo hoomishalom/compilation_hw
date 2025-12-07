@@ -7,8 +7,9 @@ public class AstVarDecl extends AstDecl {
     public String name;
     public AstExp initialValue;
 
-    public AstVarDecl(AstType type, String name, AstExp initialValue) {
+    public AstVarDecl(AstType type, String name, AstExp initialValue, int lineNumber) {
         serialNumber = AstNodeSerialNumber.getFresh();
+        this.lineNumber = lineNumber;
         if (initialValue != null)
             System.out.print("====================== varDecl -> type ID := exp;\n");
         else

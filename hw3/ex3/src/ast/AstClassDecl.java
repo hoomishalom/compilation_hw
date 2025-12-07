@@ -10,9 +10,10 @@ public class AstClassDecl extends AstDecl
 	public String superName;
 	public List<AstDecl> fields;
 
-	public AstClassDecl(String name, String superName, List<AstDecl> fields)
+	public AstClassDecl(String name, String superName, List<AstDecl> fields, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.name = name;
 		this.superName = superName;
 		this.fields = fields;

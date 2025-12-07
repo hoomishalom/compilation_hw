@@ -12,9 +12,10 @@ public class AstFuncDecl extends AstDecl
 	public List<AstFormal> formals;
 	public AstStmtList body;
 
-	public AstFuncDecl(AstType returnType, String name, List<AstFormal> formals, AstStmtList body)
+	public AstFuncDecl(AstType returnType, String name, List<AstFormal> formals, AstStmtList body, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.returnType = returnType;
 		this.name = name;
 		this.formals = formals;

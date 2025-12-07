@@ -5,9 +5,10 @@ public class AstNewExp extends AstExp
 	public AstType type;
 	public AstExp size;
 
-	public AstNewExp(AstType type, AstExp size)
+	public AstNewExp(AstType type, AstExp size, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.type = type;
 		this.size = size;
 	}

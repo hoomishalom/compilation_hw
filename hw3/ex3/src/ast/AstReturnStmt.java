@@ -4,9 +4,10 @@ public class AstReturnStmt extends AstStmt
 {
 	public AstExp exp;
 
-	public AstReturnStmt(AstExp exp)
+	public AstReturnStmt(AstExp exp, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.exp = exp;
 	}
 

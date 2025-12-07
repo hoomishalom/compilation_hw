@@ -5,9 +5,10 @@ public class AstArrayDecl extends AstDecl
 	public AstType type;
 	public String name;
 	
-	public AstArrayDecl(AstType type, String name)
+	public AstArrayDecl(AstType type, String name, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.type = type;
 		this.name = name;
 	}

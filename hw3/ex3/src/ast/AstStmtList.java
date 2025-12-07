@@ -7,9 +7,10 @@ public class AstStmtList extends AstNode
 {
 	public List<AstStmt> statements;
 
-	public AstStmtList()
+	public AstStmtList(int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		statements = new ArrayList<>();
 	}
 

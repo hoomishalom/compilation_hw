@@ -4,9 +4,10 @@ public class AstExpNegInt extends AstExp
 {
 	public int value;
 
-	public AstExpNegInt(int value)
+	public AstExpNegInt(int value, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.value = -value;
 	}
 

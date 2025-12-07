@@ -5,9 +5,10 @@ public class AstProgram extends AstNode
 {
 	public List<AstDecl> declarations;
 	
-	public AstProgram(List<AstDecl> declarations)
+	public AstProgram(List<AstDecl> declarations, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		System.out.print("====================== program -> decls\n");
 		this.declarations = declarations;
 	}

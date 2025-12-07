@@ -115,54 +115,54 @@ WrongCommentType2 = \/\*
 {CommentType1}     {}
 {CommentType2}     {}
 
-"+"					{ return symbol(TokenNames.PLUS);}
-"-"					{ return symbol(TokenNames.MINUS);}
-"*"					{ return symbol(TokenNames.TIMES);}
-"/"					{ return symbol(TokenNames.DIVIDE);}
-"("					{ return symbol(TokenNames.LPAREN);}
-")"					{ return symbol(TokenNames.RPAREN);}
-"["					{ return symbol(TokenNames.LBRACK);}
-"]"					{ return symbol(TokenNames.RBRACK);}
-"{"					{ return symbol(TokenNames.LBRACE);}
-"}"					{ return symbol(TokenNames.RBRACE);}
-","					{ return symbol(TokenNames.COMMA);}
-"."					{ return symbol(TokenNames.DOT);}
-";"					{ return symbol(TokenNames.SEMICOLON);}
+"+"					{ return symbol(TokenNames.PLUS, yyline, yycolumn);}
+"-"					{ return symbol(TokenNames.MINUS, yyline, yycolumn);}
+"*"					{ return symbol(TokenNames.TIMES, yyline, yycolumn);}
+"/"					{ return symbol(TokenNames.DIVIDE, yyline, yycolumn);}
+"("					{ return symbol(TokenNames.LPAREN, yyline, yycolumn);}
+")"					{ return symbol(TokenNames.RPAREN, yyline, yycolumn);}
+"["					{ return symbol(TokenNames.LBRACK, yyline, yycolumn);}
+"]"					{ return symbol(TokenNames.RBRACK, yyline, yycolumn);}
+"{"					{ return symbol(TokenNames.LBRACE, yyline, yycolumn);}
+"}"					{ return symbol(TokenNames.RBRACE, yyline, yycolumn);}
+","					{ return symbol(TokenNames.COMMA, yyline, yycolumn);}
+"."					{ return symbol(TokenNames.DOT, yyline, yycolumn);}
+";"					{ return symbol(TokenNames.SEMICOLON, yyline, yycolumn);}
 
-"int"				{ return symbol(TokenNames.TYPE_INT);}
-"string"			{ return symbol(TokenNames.TYPE_STRING);}
-"void"				{ return symbol(TokenNames.TYPE_VOID);}
+"int"				{ return symbol(TokenNames.TYPE_INT, yyline, yycolumn);}
+"string"			{ return symbol(TokenNames.TYPE_STRING, yyline, yycolumn);}
+"void"				{ return symbol(TokenNames.TYPE_VOID, yyline, yycolumn);}
 
-":="				{ return symbol(TokenNames.ASSIGN);}
-"="					{ return symbol(TokenNames.EQ);}
-"<"					{ return symbol(TokenNames.LT);}
-">"					{ return symbol(TokenNames.GT);}
+":="				{ return symbol(TokenNames.ASSIGN, yyline, yycolumn);}
+"="					{ return symbol(TokenNames.EQ, yyline, yycolumn);}
+"<"					{ return symbol(TokenNames.LT, yyline, yycolumn);}
+">"					{ return symbol(TokenNames.GT, yyline, yycolumn);}
 
-"array"				{return symbol(TokenNames.ARRAY);}
-"class"				{return symbol(TokenNames.CLASS);}
-"return"			{return symbol(TokenNames.RETURN);}
-"while"				{return symbol(TokenNames.WHILE);}
-"if"				{return symbol(TokenNames.IF);}
-"else"				{return symbol(TokenNames.ELSE);}
-"new"				{return symbol(TokenNames.NEW);}
-"extends"			{return symbol(TokenNames.EXTENDS);}
-"nil"				{return symbol(TokenNames.NIL);}
+"array"				{return symbol(TokenNames.ARRAY, yyline, yycolumn);}
+"class"				{return symbol(TokenNames.CLASS, yyline, yycolumn);}
+"return"			{return symbol(TokenNames.RETURN, yyline, yycolumn);}
+"while"				{return symbol(TokenNames.WHILE, yyline, yycolumn);}
+"if"				{return symbol(TokenNames.IF, yyline, yycolumn);}
+"else"				{return symbol(TokenNames.ELSE, yyline, yycolumn);}
+"new"				{return symbol(TokenNames.NEW, yyline, yycolumn);}
+"extends"			{return symbol(TokenNames.EXTENDS, yyline, yycolumn);}
+"nil"				{return symbol(TokenNames.NIL, yyline, yycolumn);}
 
-{STRING} 		    { return symbol(TokenNames.STRING, yytext());}
+{STRING} 		    { return symbol(TokenNames.STRING, yyline, yycolumn, yytext());}
 {INTEGER}			{ 
     try {
         int value = Integer.parseInt(yytext());
         if (value > 32767) {
             throw new RuntimeException("ERROR");
         }
-        return symbol(TokenNames.INT, Integer.valueOf(yytext()));
+        return symbol(TokenNames.INT, yyline, yycolumn, Integer.valueOf(yytext()));
     } catch (NumberFormatException e) {
         throw new RuntimeException("ERROR");
     }
                     }
-{ID}				{ return symbol(TokenNames.ID,     yytext());}
+{ID}				{ return symbol(TokenNames.ID, yyline, yycolumn, yytext());}
 {WhiteSpace}		{ /* just skip what was found, do nothing */ }
-<<EOF>>				{ return symbol(TokenNames.EOF);}
+<<EOF>>				{ return symbol(TokenNames.EOF, yyline, yycolumn);}
 {WRONG_INTEGER}		{ throw new RuntimeException("ERROR");}
 {WrongCommentType2} { throw new RuntimeException("ERROR");}
 .					{ throw new RuntimeException("ERROR");} /* . catches everything, NO_MATCH catch */

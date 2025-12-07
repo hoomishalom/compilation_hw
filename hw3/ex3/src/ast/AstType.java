@@ -4,9 +4,10 @@ public class AstType extends AstNode
 {
 	public String typeName;
 	
-	public AstType(String typeName)
+	public AstType(String typeName, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		System.out.print("====================== type -> " + typeName + "\n");
 		this.typeName = typeName;
 	}

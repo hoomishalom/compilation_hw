@@ -8,9 +8,10 @@ public class AstExpBinop extends AstExp
 	public AstExp right;
 	public OP op;
 
-	public AstExpBinop(AstExp left, AstExp right, OP op)
+	public AstExpBinop(AstExp left, AstExp right, OP op, int lineNumber)
 	{
 		serialNumber = AstNodeSerialNumber.getFresh();
+		this.lineNumber = lineNumber;
 		this.left = left;
 		this.right = right;
 		this.op = op;
